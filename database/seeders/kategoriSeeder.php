@@ -35,7 +35,7 @@ class kategoriSeeder extends Seeder
                 'nama' => 'Makanan',
             ],
             (object)[
-                'nama' => 'Elektronik Rumah Tangga',
+                'nama' => 'Komputer',
             ],
         ];
         //
@@ -43,6 +43,61 @@ class kategoriSeeder extends Seeder
 
             DB::table('kategori_barang')->insert([
                 'nama' => $data->nama,
+                'img' => null,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+        }
+
+
+        DB::table('barang')->truncate();
+
+        $kategoriList = [
+            (object)[
+                'kategori_barang_id' => 1,
+                'nama' => 'Kulkas A',
+            ],
+            (object)[
+                'kategori_barang_id' => 1,
+                'nama' => 'Kulkas B',
+            ],
+            (object)[
+                'kategori_barang_id' => 1,
+                'nama' => 'Kulkas C',
+            ],
+
+            (object)[
+                'kategori_barang_id' => 2,
+                'nama' => 'Apel',
+            ],
+
+            (object)[
+                'kategori_barang_id' => 2,
+                'nama' => 'Pisang',
+            ],
+
+
+            (object)[
+                'kategori_barang_id' => 3,
+                'nama' => 'Ryzen 3',
+            ],
+
+            (object)[
+                'kategori_barang_id' => 3,
+                'nama' => 'Ryzen 5',
+            ],
+
+            (object)[
+                'kategori_barang_id' => 3,
+                'nama' => 'Ryzen 7',
+            ],
+        ];
+        //
+        foreach ($kategoriList as $data) {
+
+            DB::table('barang')->insert([
+                'nama' => $data->nama,
+                'kategori_barang_id' => $data->kategori_barang_id,
                 'img' => null,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()

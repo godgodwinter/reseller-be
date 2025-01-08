@@ -44,25 +44,9 @@ return [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
-        'siswa' => [
+        'reseller' => [
             'driver' => 'jwt',
-            'provider' => 'siswa',
-        ],
-        'gurubk' => [
-            'driver' => 'jwt',
-            'provider' => 'gurubk',
-        ],
-        'yayasan' => [
-            'driver' => 'jwt',
-            'provider' => 'yayasan',
-        ],
-        'owner' => [
-            'driver' => 'jwt',
-            'provider' => 'owner',
-        ],
-        'ortu' => [
-            'driver' => 'jwt',
-            'provider' => 'ortu',
+            'provider' => 'reseller',
         ],
     ],
 
@@ -88,27 +72,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-        'siswa' => [
+        'reseller' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Siswa::class,
+            'model' => App\Models\Reseller::class,
         ],
-        'yayasan' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Yayasan::class,
-        ],
-        'gurubk' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Gurubk::class,
-        ],
-        'owner' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Owner::class,
-        ],
-        'ortu' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Ortu::class,
-        ],
-
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
@@ -137,32 +104,8 @@ return [
             'expire' => 60, //expired token at jwt.php
             'throttle' => 60,
         ],
-        'siswa' => [
-            'provider' => 'siswa',
-            'table' => 'password_resets',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
-        'yayasan' => [
-            'provider' => 'yayasan',
-            'table' => 'password_resets',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
-        'gurubk' => [
-            'provider' => 'gurubk',
-            'table' => 'password_resets',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
-        'ortu' => [
-            'provider' => 'ortu',
-            'table' => 'password_resets',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
-        'owner' => [
-            'provider' => 'owner',
+        'reseller' => [
+            'provider' => 'reseller',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,

@@ -6,27 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class kategori extends Model
+class transaksi_setor_barang extends Model
 {
-    public $table = "kategori";
+    public $table = "transaksi_setor_barang";
 
     use SoftDeletes;
     use HasFactory;
 
-    // protected $fillable = [
-    //     'nama',
-    //     'sekolah_id',
-    //     'walikelas_id',
-    // ];
-
-
     protected $guarded = [];
-
-
-    public function transaksi()
-    {
-        return $this->hasMany('App\Models\transaksi');
-    }
 
     public static function boot()
     {

@@ -13,7 +13,7 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('babeng:adminOwner', ['except' => ['login', 'register']]);
     }
 
     public function login(Request $request)
@@ -96,6 +96,7 @@ class AuthController extends Controller
      */
     public function me()
     {
+        // return response()->json(['message' => 'ME']);
         return response()->json($this->guard()->user());
     }
 

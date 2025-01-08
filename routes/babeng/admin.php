@@ -11,13 +11,25 @@ use Illuminate\Support\Facades\Route;
 // php get .env
 
 // $prefix = getenv('API_VERSION') ? getenv('API_VERSION') : 'v1';
-Route::post("admin/auth/login", [AuthController::class, 'login']);
 // Route::post('/admin/auth/register', [AuthController::class, 'register'])->name('admin.auth.register');
 // Route::middleware('api')->group(function () {
-Route::middleware('auth:api')->group(
+Route::post("admin/auth/login", [AuthController::class, 'login']);
+Route::get("admin/index", function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'Ini index admin tanpa login',
+        'data' => [
+            'id' => 1,
+            'name' => 'FAKE DATA Admin Name',
+            'role' => 'Administrator'
+        ],
+    ]);
+});
+// Route::middleware(['auth:api'])->group(
+
+Route::middleware('babeng:adminOwner')->group(
     function () {
         Route::get("admin/auth/me", [AuthController::class, 'me']);
-        // get My Data and New Token
         Route::post("admin/auth/profile", [AuthController::class, 'refresh']);
         // update
         Route::put("admin/auth/profile", [AuthController::class, 'update']);
