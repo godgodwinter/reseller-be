@@ -19,6 +19,7 @@ return new class extends Migration
             $table->longText('img')->nullable();
             // relasi
             $table->bigInteger('kategori_barang_id')->nullable();
+            $table->string('status')->nullable()->default('Aktif');
             $table->softDeletes();
             $table->timestamps();
         });

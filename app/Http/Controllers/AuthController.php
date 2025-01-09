@@ -97,7 +97,11 @@ class AuthController extends Controller
     public function me()
     {
         // return response()->json(['message' => 'ME']);
-        return response()->json($this->guard()->user());
+        return response()->json([
+            'success' => true,
+            'data' => ($this->guard()->user())
+        ]);
+        // return response()->json($this->guard()->user());
     }
 
 
@@ -154,8 +158,8 @@ class AuthController extends Controller
 
         $user = User::find(Auth::user()->id);
         $user->nama = $request->nama;
-        $user->username = $request->username;
-        $user->email = $request->email;
+        // $user->username = $request->username;
+        // $user->email = $request->email;
         $user->save();
 
         if ($request->password) {

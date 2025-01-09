@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\adminAdministratorController;
-use App\Http\Controllers\admin\adminKategoriController;
+use App\Http\Controllers\admin\adminKategoriBarangController;
 use App\Http\Controllers\admin\adminProsesController;
 use App\Http\Controllers\admin\adminRekapController;
 use App\Http\Controllers\admin\adminTransaksiController;
@@ -34,12 +34,28 @@ Route::middleware('babeng:adminOwner')->group(
         // update
         Route::put("admin/auth/profile", [AuthController::class, 'update']);
 
-        Route::get('/admin/kategori', [adminKategoriController::class, 'index']);
-        Route::post('/admin/kategori', [adminKategoriController::class, 'store']);
-        Route::get('/admin/kategori/{item}', [adminKategoriController::class, 'edit']);
-        Route::put('/admin/kategori/{item}', [adminKategoriController::class, 'update']);
-        Route::delete('/admin/kategori/{item}', [adminKategoriController::class, 'destroy']);
+        Route::get('/admin/kategori_barang', [adminKategoriBarangController::class, 'index']);
+        Route::post('/admin/kategori_barang', [adminKategoriBarangController::class, 'store']);
+        Route::get('/admin/kategori_barang/{item}', [adminKategoriBarangController::class, 'edit']);
+        Route::put('/admin/kategori_barang/{item}', [adminKategoriBarangController::class, 'update']);
+        Route::delete('/admin/kategori_barang/{item}', [adminKategoriBarangController::class, 'destroy']);
+        Route::delete('/admin/kategori_barang/{item}/force', [adminKategoriBarangController::class, 'destroyForce']);
 
+
+        // Route::get('/admin/barang', [adminKategoriController::class, 'index']);
+        // Route::post('/admin/barang', [adminKategoriController::class, 'store']);
+        // Route::get('/admin/barang/{item}', [adminKategoriController::class, 'edit']);
+        // Route::put('/admin/barang/{item}', [adminKategoriController::class, 'update']);
+        // Route::delete('/admin/barang/{item}', [adminKategoriController::class, 'destroy']);
+        // Route::delete('/admin/barang/{item}/force', [adminKategoriController::class, 'destroyForce']);
+
+
+        // Route::get('/admin/stok_barang', [adminKategoriController::class, 'index']);
+        // Route::post('/admin/stok_barang', [adminKategoriController::class, 'store']);
+        // Route::get('/admin/stok_barang/{item}', [adminKategoriController::class, 'edit']);
+        // Route::put('/admin/stok_barang/{item}', [adminKategoriController::class, 'update']);
+        // Route::delete('/admin/stok_barang/{item}', [adminKategoriController::class, 'destroy']);
+        // Route::delete('/admin/stok_barang/{item}/force', [adminKategoriController::class, 'destroyForce']);
 
 
 
@@ -51,29 +67,15 @@ Route::middleware('babeng:adminOwner')->group(
         Route::delete('/admin/users/{item}/force', [adminAdministratorController::class, 'destroyForce']);
 
 
-        Route::get('/admin/transaksi', [adminTransaksiController::class, 'index']);
-        Route::post('/admin/transaksi', [adminTransaksiController::class, 'store']);
-        Route::get('/admin/transaksi/{item}', [adminTransaksiController::class, 'edit']);
-        Route::put('/admin/transaksi/{item}', [adminTransaksiController::class, 'update']);
-        Route::delete('/admin/transaksi/{item}', [adminTransaksiController::class, 'destroy']);
-        Route::delete('/admin/transaksi/{item}/force', [adminTransaksiController::class, 'destroyForce']);
 
-        // !baru
-        Route::get('/admin/data_kategori/jenis', [adminKategoriController::class, 'get_jenis']);
+        // Route::get('/admin/reseller', [adminKategoriController::class, 'index']);
+        // Route::post('/admin/reseller', [adminKategoriController::class, 'store']);
+        // Route::get('/admin/reseller/{item}', [adminKategoriController::class, 'edit']);
+        // Route::put('/admin/reseller/{item}', [adminKategoriController::class, 'update']);
+        // Route::delete('/admin/reseller/{item}', [adminKategoriController::class, 'destroy']);
+        // Route::delete('/admin/reseller/{item}/force', [adminAdministratorController::class, 'destroyForce']);
 
 
-        Route::get('/admin/datatransaksi/ringkasan', [adminRekapController::class, 'ringkasan']);
-        Route::get('/admin/datatransaksi/ringkasan/kategori', [adminRekapController::class, 'rekap_kategori']);
-        Route::get('/admin/datatransaksi/ringkasan/kategori/{kategori_id}', [adminRekapController::class, 'rekap_kategori_detail']);
-        Route::get('/admin/datatransaksi_pertahun/ringkasan', [adminRekapController::class, 'pertahun_ringkasan']);
-        Route::get('/admin/datatransaksi_pertahun/ringkasan/kategori', [adminRekapController::class, 'pertahun_rekap_kategori']);
-
-
-        Route::get('/admin/data_transaksi/detail', [adminRekapController::class, 'transaksi_detail']); //!detail harian
-        Route::post('/admin/data_transaksi/detail', [adminRekapController::class, 'transaksi_detail']); //!detail harian
-        Route::get('/admin/data_transaksi/detail_less', [adminRekapController::class, 'transaksi_detail_less']); //!detail harian
-        Route::get('/admin/data_transaksi/detail/bulanan', [adminRekapController::class, 'transaksi_detail_bulanan']); //!detail bulanan
-        Route::get('/admin/data_transaksi/detail/tahunan', [adminRekapController::class, 'transaksi_detail_tahunan']); //!detail tahunan
         // !baru
 
 
