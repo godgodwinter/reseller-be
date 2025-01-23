@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\admin\adminAdministratorController;
+use App\Http\Controllers\admin\adminBarangController;
 use App\Http\Controllers\admin\adminKategoriBarangController;
 use App\Http\Controllers\admin\adminProsesController;
 use App\Http\Controllers\admin\adminRekapController;
+use App\Http\Controllers\admin\adminResellerController;
+use App\Http\Controllers\admin\adminStokBarangController;
 use App\Http\Controllers\admin\adminTransaksiController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -39,23 +42,21 @@ Route::middleware('babeng:adminOwner')->group(
         Route::get('/admin/kategori_barang/{item}', [adminKategoriBarangController::class, 'edit']);
         Route::put('/admin/kategori_barang/{item}', [adminKategoriBarangController::class, 'update']);
         Route::delete('/admin/kategori_barang/{item}', [adminKategoriBarangController::class, 'destroy']);
-        Route::delete('/admin/kategori_barang/{item}/force', [adminKategoriBarangController::class, 'destroyForce']);
 
 
-        // Route::get('/admin/barang', [adminKategoriController::class, 'index']);
-        // Route::post('/admin/barang', [adminKategoriController::class, 'store']);
-        // Route::get('/admin/barang/{item}', [adminKategoriController::class, 'edit']);
-        // Route::put('/admin/barang/{item}', [adminKategoriController::class, 'update']);
-        // Route::delete('/admin/barang/{item}', [adminKategoriController::class, 'destroy']);
-        // Route::delete('/admin/barang/{item}/force', [adminKategoriController::class, 'destroyForce']);
+        Route::get('/admin/barang', [adminBarangController::class, 'index']);
+        Route::post('/admin/barang', [adminBarangController::class, 'store']);
+        Route::get('/admin/barang/{item}', [adminBarangController::class, 'edit']);
+        Route::put('/admin/barang/{item}', [adminBarangController::class, 'update']);
+        Route::delete('/admin/barang/{item}', [adminBarangController::class, 'destroy']);
 
 
-        // Route::get('/admin/stok_barang', [adminKategoriController::class, 'index']);
-        // Route::post('/admin/stok_barang', [adminKategoriController::class, 'store']);
-        // Route::get('/admin/stok_barang/{item}', [adminKategoriController::class, 'edit']);
-        // Route::put('/admin/stok_barang/{item}', [adminKategoriController::class, 'update']);
-        // Route::delete('/admin/stok_barang/{item}', [adminKategoriController::class, 'destroy']);
-        // Route::delete('/admin/stok_barang/{item}/force', [adminKategoriController::class, 'destroyForce']);
+        Route::get('/admin/stok_barang', [adminStokBarangController::class, 'index']);
+        Route::post('/admin/stok_barang/get', [adminStokBarangController::class, 'index']);
+        Route::post('/admin/stok_barang', [adminStokBarangController::class, 'store']);
+        Route::get('/admin/stok_barang/{item}', [adminStokBarangController::class, 'edit']);
+        Route::put('/admin/stok_barang/{item}', [adminStokBarangController::class, 'update']);
+        Route::delete('/admin/stok_barang/{item}', [adminStokBarangController::class, 'destroy']);
 
 
 
@@ -63,8 +64,15 @@ Route::middleware('babeng:adminOwner')->group(
         Route::post('/admin/users', [adminAdministratorController::class, 'store']);
         Route::get('/admin/users/{item}', [adminAdministratorController::class, 'edit']);
         Route::put('/admin/users/{item}', [adminAdministratorController::class, 'update']);
+        Route::put('/admin/users/{item}/pass', [adminAdministratorController::class, 'updatePassword']);
         Route::delete('/admin/users/{item}', [adminAdministratorController::class, 'destroy']);
-        Route::delete('/admin/users/{item}/force', [adminAdministratorController::class, 'destroyForce']);
+
+        Route::get('/admin/reseller', [adminResellerController::class, 'index']);
+        Route::post('/admin/reseller', [adminResellerController::class, 'store']);
+        Route::get('/admin/reseller/{item}', [adminResellerController::class, 'edit']);
+        Route::put('/admin/reseller/{item}', [adminResellerController::class, 'update']);
+        Route::put('/admin/reseller/{item}/pass', [adminResellerController::class, 'updatePassword']);
+        Route::delete('/admin/reseller/{item}', [adminResellerController::class, 'destroy']);
 
 
 

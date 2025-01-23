@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Helpers\Fungsi;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,32 +28,8 @@ class Reseller extends Authenticatable implements JWTSubject
 
 
 
-    // protected $fillable = [
-    //     'nama',
-    //     'email',
-    //     'username',
-    //     'nomeridentitas',
-    //     'password',
-    //     'agama',
-    //     'tempatlahir',
-    //     'tgllahir',
-    //     'alamat',
-    //     'jk',
-    //     'telp',
-    //     'kelas_id',
-    //     'status_login', //Aktif/Nonaktif login
-    // ];
 
     protected $guarded = [];
-
-    // public function kelas()
-    // {
-    //     return $this->belongsTo(kelas::class, 'kelas_id', 'id');
-    // }
-    // public function kelas()
-    // {
-    //     return $this->belongsTo('App\Models\kelas');
-    // }
 
     /**
      * The attributes that should be hidden for serialization.

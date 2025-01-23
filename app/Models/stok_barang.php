@@ -15,6 +15,12 @@ class stok_barang extends Model
 
     protected $guarded = [];
 
+
+    public function barang()
+    {
+        return $this->belongsTo(barang::class);
+    }
+
     public static function boot()
     {
         parent::boot();

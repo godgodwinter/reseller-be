@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\transaksi;
-use App\Models\User;
+use App\Models\Reseller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-class adminAdministratorController extends Controller
+class adminResellerController extends Controller
 {
     public function index(Request $request)
     {
-        $items = User::get();
+        $items = Reseller::get();
         return response()->json([
             'success'    => true,
             'data'    => $items,
@@ -22,6 +21,7 @@ class adminAdministratorController extends Controller
 
     public function store(Request $request)
     {
+
         //set validation
         $validator = Validator::make($request->all(), [
             'nama'   => 'required',
@@ -31,17 +31,18 @@ class adminAdministratorController extends Controller
             'username' => 'required',
 
         ]);
+        // !ambil id dari admin yang login
+        $pembuat_id = auth()->id();
 
         $items = 'Data berhasil di tambahkan';
-        // $data = $request->except('_token');
-        // apiprobk::create($data);
 
-        $user = User::create([
+        $user = Reseller::create([
             'nama' => $request->nama,
             'email' => $request->email,
             'username' => $request->username,
             // 'nomeridentitas' => $request->nomeridentitas,
             'password' => Hash::make($request->password),
+            'pembuat_id' => $pembuat_id,
         ]);
 
         return response()->json([
@@ -51,14 +52,14 @@ class adminAdministratorController extends Controller
         ], 200);
     }
 
-    public function edit(User $item)
+    public function edit(Reseller $item)
     {
         return response()->json([
             'success'    => true,
             'data'    => $item,
         ], 200);
     }
-    public function update(User $item, Request $request)
+    public function update(Reseller $item, Request $request)
     {
 
         //set validation
@@ -70,7 +71,7 @@ class adminAdministratorController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        User::where('id', $item->id)
+        Reseller::where('id', $item->id)
             ->update([
                 'nama' => $request->nama,
                 'email' => $request->email,
@@ -82,9 +83,17 @@ class adminAdministratorController extends Controller
 
         // update password
         if ($request->password) {
-            User::where('id', $item->id)
+            Reseller::where('id', $item->id)
                 ->update([
                     'password' => Hash::make($request->password),
+                    'updated_at' => date("Y-m-d H:i:s")
+                ]);
+        }
+
+        if ($request->status_login) {
+            Reseller::where('id', $item->id)
+                ->update([
+                    'status_login' => $request->status_login,
                     'updated_at' => date("Y-m-d H:i:s")
                 ]);
         }
@@ -95,7 +104,7 @@ class adminAdministratorController extends Controller
             'id' => $item->id
         ], 200);
     }
-    public function updatePassword(User $item, Request $request)
+    public function updatePassword(Reseller $item, Request $request)
     {
         // Validasi input hanya untuk password
         $validator = Validator::make($request->all(), [
@@ -121,10 +130,10 @@ class adminAdministratorController extends Controller
         ], 200);
     }
 
-    // public function destroy(User $item)
+    // public function destroy(Reseller $item)
     // {
 
-    //     User::destroy($item->id);
+    //     Reseller::destroy($item->id);
     //     return response()->json([
     //         'success'    => true,
     //         'message'    => 'Data berhasil di hapus!',
@@ -133,7 +142,7 @@ class adminAdministratorController extends Controller
     public function destroy($item)
     {
 
-        User::where('id', $item)->forcedelete();
+        Reseller::where('id', $item)->forcedelete();
         return response()->json([
             'success'    => true,
             'message'    => 'Data berhasil di hapus!',

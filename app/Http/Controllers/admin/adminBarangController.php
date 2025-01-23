@@ -3,41 +3,47 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\barang;
 use App\Models\kategori_barang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class adminKategoriBarangController extends Controller
+class adminBarangController extends Controller
 {
-    // public function get_jenis(Request $request)
-    // {
-    //     $jenis = $request->jenis ? $request->jenis : "Pengeluaran";
-    //     // dd($jenis);
-    //     $items = kategori_barang::where("jenis", $jenis)->whereNull("deleted_at")->orderBy('nama', 'asc')->get();
-    //     // $items = kategori_barang::where("jenis", $jenis)->whereNull("deleted_at")->orderBy('nama', 'asc')->get();
-    //     return response()->json([
-    //         'success'    => true,
-    //         'data'    => $items,
-    //     ], 200);
-    // }
-
     public function index(Request $request)
     {
-        $jenis = $request->jenis ? $request->jenis : null;
-        if ($jenis) {
-            $items = kategori_barang::orderBy('nama', 'asc')
-                ->whereNull("deleted_at")
-                // ->where("jenis", $jenis)
-                ->get();
-        } else {
-            $items = kategori_barang::orderBy('nama', 'asc')
-                ->whereNull("deleted_at")
-                // ->whereIn("jenis", ["Pengeluaran", "Pemasukan"])
-                ->get();
+        $kategori_barang_id = $request->kategori_barang_id;
+
+        // $query = Barang::with(['stok' => function ($q) {
+        //     $q->where('status', 'Aktif'); // Hanya menghitung stok dengan status "Aktif"
+        // }])
+        $query = Barang::with([
+            'stok' => function ($q) {
+                $q->where('status', 'Aktif'); // Hanya menghitung stok dengan status "Aktif"
+            },
+            'kategoriBarang' // Tambahkan relasi kategori barang
+        ])
+            ->orderBy('nama', 'asc')
+            ->whereNull("deleted_at")
+            ->where("status", "Aktif");
+
+        if ($kategori_barang_id) {
+            $query->where("kategori_barang_id", $kategori_barang_id);
         }
+
+        // $items = $query->get()->map(function ($barang) {
+        //     $barang->total_stok = $barang->stok->sum('jml'); // Tambahkan total stok ke hasil
+        //     return $barang;
+        // });
+        $items = $query->get()->map(function ($barang) {
+            $barang->total_stok = $barang->stok->sum('jml'); // Tambahkan total stok ke hasil
+            $barang->kategori_barang_nama = $barang->kategoriBarang->nama ?? null; // Tambahkan kategori_barang_nama
+            return $barang;
+        });
+
         return response()->json([
-            'success'    => true,
+            'success' => true,
             'data'    => $items,
         ], 200);
     }
@@ -47,7 +53,7 @@ class adminKategoriBarangController extends Controller
         //set validation
         $validator = Validator::make($request->all(), [
             'nama'   => 'required',
-            // 'jenis'   => 'required',
+            'kategori_barang_id'   => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -61,10 +67,12 @@ class adminKategoriBarangController extends Controller
         // $data = $request->except('_token');
         // apiprobk::create($data);
 
-        $data_id = DB::table('kategori_barang')->insertGetId(
+        $data_id = DB::table('barang')->insertGetId(
             array(
                 'nama'     =>   $request->nama,
+                'kategori_barang_id'     =>   $request->kategori_barang_id,
                 'img'     =>   $request->img,
+                'status'     =>  $request->status ? $request->status : 'Aktif',
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s")
             )
@@ -77,14 +85,22 @@ class adminKategoriBarangController extends Controller
         ], 200);
     }
 
-    public function edit(kategori_barang $item)
+    public function edit(barang $item)
     {
+        // Muat relasi stok
+        $item->load(['stok' => function ($q) {
+            $q->where('status', 'Aktif'); // Hanya stok aktif
+        }]);
+
+        // Hitung total stok
+        $item->total_stok = $item->stok->sum('jml');
+
         return response()->json([
-            'success'    => true,
+            'success' => true,
             'data'    => $item,
         ], 200);
     }
-    public function update(kategori_barang $item, Request $request)
+    public function update(barang $item, Request $request)
     {
 
         //set validation
@@ -97,10 +113,12 @@ class adminKategoriBarangController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        kategori_barang::where('id', $item->id)
+        barang::where('id', $item->id)
             ->update([
                 'nama'     =>   $request->nama,
+                'kategori_barang_id'     =>   $request->kategori_barang_id,
                 'img'     =>   $request->img,
+                'status'     =>  $request->status ? $request->status : 'Aktif',
                 'updated_at' => date("Y-m-d H:i:s")
             ]);
 
@@ -110,12 +128,12 @@ class adminKategoriBarangController extends Controller
             'id' => $item->id
         ], 200);
     }
-    public function destroy(kategori_barang $item)
+    public function destroy(barang $item)
     {
 
         // kategori::destroy($item->id);
         // delete permanent
-        kategori_barang::where('id', $item->id)->forcedelete();
+        barang::where('id', $item->id)->forcedelete();
 
         return response()->json([
             'success'    => true,

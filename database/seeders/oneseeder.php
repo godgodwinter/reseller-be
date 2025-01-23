@@ -56,7 +56,7 @@ class oneseeder extends Seeder
             'email' => 'reseller_1@gmail.com',
             'username' => 'res1',
             'nomeridentitas' => '1',
-            'password' => Hash::make('aaa'),
+            'password' => Hash::make('res1'),
             'pembuat_id' => '1',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
@@ -67,7 +67,7 @@ class oneseeder extends Seeder
             'email' => 'reseller_2@gmail.com',
             'username' => 'res2',
             'nomeridentitas' => '2',
-            'password' => Hash::make('aaa'),
+            'password' => Hash::make('res2'),
             'pembuat_id' => '1',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
@@ -78,7 +78,7 @@ class oneseeder extends Seeder
             'email' => 'reseller_3@gmail.com',
             'username' => 'res3',
             'nomeridentitas' => '3',
-            'password' => Hash::make('aaa'),
+            'password' => Hash::make('res3'),
             'pembuat_id' => '1',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
