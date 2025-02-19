@@ -12,8 +12,10 @@ use Illuminate\Support\Facades\Validator;
 
 class adminStokBarangController extends Controller
 {
+
     public function index(Request $request)
     {
+        // Validasi input barang_id
         $barang_id = $request->barang_id ? $request->barang_id : null;
         $sort_by = $request->sort_by ? $request->sort_by : 'barang_id'; // Default sorting by 'barang_id'
         $sort_direction = $request->sort_direction ? $request->sort_direction : 'asc'; // Default sorting direction is ascending
@@ -27,15 +29,16 @@ class adminStokBarangController extends Controller
             ], 400);
         }
 
-        // Query
+        // Query utama untuk mengambil data stok barang
         $query = stok_barang::select('stok_barang.*') // Pilih kolom dari tabel stok_barang
-            ->whereNull('stok_barang.deleted_at') // Gunakan alias tabel untuk menghindari ambiguitas
+            ->whereNull('stok_barang.deleted_at') // Hanya ambil data yang tidak dihapus
             ->where('stok_barang.status', 'Aktif')
             ->whereNotNull('stok_barang.barang_id')
             ->with('barang'); // Load relasi barang
 
+        // Filter berdasarkan barang_id jika ada
         if ($barang_id) {
-            $query->where('stok_barang.barang_id', $barang_id); // Tambahkan alias tabel
+            $query->where('stok_barang.barang_id', $barang_id);
         }
 
         // Sorting berdasarkan kategori_barang_id
@@ -47,14 +50,74 @@ class adminStokBarangController extends Controller
             $query->orderBy($sort_by, $sort_direction);
         }
 
-        // Tambahkan distinct untuk menghilangkan duplikasi
+        // Ambil semua data stok barang
         $items = $query->distinct()->get();
 
+        // Loop untuk memeriksa dan mengurangi stok barang berdasarkan transaksi nitip barang
+        foreach ($items as $item) {
+            // Hitung total jumlah barang yang sudah diambil dalam transaksi nitip barang
+            $totalQtyTaken = DB::table('transaksi_nitip_barang_detail')
+                ->where('stok_barang_id', $item->id) // Relasi ke stok_barang
+                ->whereNull('deleted_at') // Pastikan data tidak dihapus
+                ->sum('qty'); // Jumlahkan qty yang sudah diambil
+
+            // Kurangi stok barang dengan total qty yang sudah diambil
+            $item->jml -= $totalQtyTaken;
+
+            // Pastikan jumlah stok tidak negatif
+            $item->jml = max(0, $item->jml);
+        }
+
+        // Kembalikan respons JSON
         return response()->json([
             'success' => true,
             'data' => $items,
         ], 200);
     }
+
+    // public function index(Request $request)
+    // {
+    //     $barang_id = $request->barang_id ? $request->barang_id : null;
+    //     $sort_by = $request->sort_by ? $request->sort_by : 'barang_id'; // Default sorting by 'barang_id'
+    //     $sort_direction = $request->sort_direction ? $request->sort_direction : 'asc'; // Default sorting direction is ascending
+
+    //     // Validasi kolom yang dapat digunakan untuk sorting
+    //     $valid_sort_columns = ['jml', 'harga', 'barang_id', 'kategori_barang_id'];
+    //     if (!in_array($sort_by, $valid_sort_columns)) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Invalid sort column. Allowed values: jml, harga, barang_id, kategori_barang_id.',
+    //         ], 400);
+    //     }
+
+    //     // Query
+    //     $query = stok_barang::select('stok_barang.*') // Pilih kolom dari tabel stok_barang
+    //         ->whereNull('stok_barang.deleted_at') // Gunakan alias tabel untuk menghindari ambiguitas
+    //         ->where('stok_barang.status', 'Aktif')
+    //         ->whereNotNull('stok_barang.barang_id')
+    //         ->with('barang'); // Load relasi barang
+
+    //     if ($barang_id) {
+    //         $query->where('stok_barang.barang_id', $barang_id); // Tambahkan alias tabel
+    //     }
+
+    //     // Sorting berdasarkan kategori_barang_id
+    //     if ($sort_by === 'kategori_barang_id') {
+    //         $query->join('barang', 'stok_barang.barang_id', '=', 'barang.id')
+    //             ->whereNull('barang.deleted_at') // Pastikan `deleted_at` dari tabel barang dihandle
+    //             ->orderBy('barang.kategori_barang_id', $sort_direction);
+    //     } else {
+    //         $query->orderBy($sort_by, $sort_direction);
+    //     }
+
+    //     // Tambahkan distinct untuk menghilangkan duplikasi
+    //     $items = $query->distinct()->get();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => $items,
+    //     ], 200);
+    // }
 
 
 

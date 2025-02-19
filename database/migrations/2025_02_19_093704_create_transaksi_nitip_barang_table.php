@@ -13,10 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('transaksi_setor_barang', function (Blueprint $table) {
+        Schema::create('transaksi_nitip_barang', function (Blueprint $table) {
             $table->bigIncrements('id');
+            // !data
+            $table->string('tgl_transaksi_nitip_barang')->nullable();
             // relasi
-            $table->bigInteger('stok_barang_id')->nullable();
             $table->bigInteger('users_id')->nullable(); // seller / admin
             $table->bigInteger('reseller_id')->nullable(); // penerima
             $table->string('status')->nullable()->default('Aktif');
@@ -32,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('transaksi_setor_barang');
+        Schema::dropIfExists('transaksi_nitip_barang');
     }
 };

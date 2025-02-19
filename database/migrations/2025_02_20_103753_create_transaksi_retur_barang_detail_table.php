@@ -13,22 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('transaksi_nitip_barang', function (Blueprint $table) {
+        Schema::create('transaksi_retur_barang_detail', function (Blueprint $table) {
             $table->bigIncrements('id');
-            // !data dari stok barang tetepi tidak perlu di update ketika seller mengupdate data karena barang sudah di tangan reseller
-            $table->bigInteger('stok_barang_id')->nullable();
-            $table->string('jml')->nullable();
-            $table->string('harga')->nullable();
-            $table->string('ket')->nullable();
-            $table->longText('img')->nullable();
-            // !data
-            // $table->string('nama_barang')->nullable();
-            // $table->string('nama_barang_alter')->nullable();
-            $table->string('tgl_transaksi_nitip_barang')->nullable();
             // relasi
+            $table->bigInteger('transaksi_retur_barang_id')->nullable();
+            $table->bigInteger('stok_barang_id')->nullable();
             $table->bigInteger('users_id')->nullable(); // seller / admin
             $table->bigInteger('reseller_id')->nullable(); // penerima
             $table->string('status')->nullable()->default('Aktif');
+            // $table->string('qty')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -41,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('transaksi_nitip_barang');
+        Schema::dropIfExists('transaksi_retur_barang_detail');
     }
 };

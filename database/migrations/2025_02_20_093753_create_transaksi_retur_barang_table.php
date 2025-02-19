@@ -20,6 +20,7 @@ return new class extends Migration
             $table->bigInteger('users_id')->nullable(); // seller / admin
             $table->bigInteger('reseller_id')->nullable(); // penerima
             $table->string('status')->nullable()->default('Aktif');
+            // $table->string('qty')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

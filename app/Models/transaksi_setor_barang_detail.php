@@ -6,24 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class transaksi_nitip_barang extends Model
+class transaksi_setor_barang_detail extends Model
 {
-    public $table = "transaksi_nitip_barang";
+    public $table = "transaksi_setor_barang_detail";
 
     use SoftDeletes;
     use HasFactory;
 
     protected $guarded = [];
 
-    public function reseller()
-    {
-        return $this->belongsTo(reseller::class);
-    }
-
-    public function transaksi_nitip_barang_detail()
-    {
-        return $this->hasMany(transaksi_nitip_barang_detail::class);
-    }
     public static function boot()
     {
         parent::boot();

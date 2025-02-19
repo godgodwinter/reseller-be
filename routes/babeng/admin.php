@@ -8,6 +8,7 @@ use App\Http\Controllers\admin\adminRekapController;
 use App\Http\Controllers\admin\adminResellerController;
 use App\Http\Controllers\admin\adminStokBarangController;
 use App\Http\Controllers\admin\adminTransaksiController;
+use App\Http\Controllers\admin\adminTransaksiNitipbarangController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -74,7 +75,13 @@ Route::middleware('babeng:adminOwner')->group(
         Route::put('/admin/reseller/{item}/pass', [adminResellerController::class, 'updatePassword']);
         Route::delete('/admin/reseller/{item}', [adminResellerController::class, 'destroy']);
 
-
+        // !transaksi
+        Route::get('/admin/transaksi/nitip_barang', [adminTransaksiNitipbarangController::class, 'index']);
+        Route::post('/admin/transaksi/nitip_barang/get', [adminTransaksiNitipbarangController::class, 'index']);
+        Route::post('/admin/transaksi/nitip_barang/get/reseller/{reseller_id}', [adminTransaksiNitipbarangController::class, 'get_where_reseller_id']);
+        Route::post('/admin/transaksi/nitip_barang/get/reseller/{reseller_id}/per_barang', [adminTransaksiNitipbarangController::class, 'get_where_reseller_id_per_barang']);
+        Route::post('/admin/transaksi/nitip_barang/get/reseller/{reseller_id}/per_stok_barang', [adminTransaksiNitipbarangController::class, 'get_where_reseller_id_per_stok_barang']);
+        Route::post('/admin/transaksi/nitip_barang', [adminTransaksiNitipbarangController::class, 'store']);
 
         // Route::get('/admin/reseller', [adminKategoriController::class, 'index']);
         // Route::post('/admin/reseller', [adminKategoriController::class, 'store']);
