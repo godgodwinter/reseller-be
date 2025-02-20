@@ -11,42 +11,95 @@ use Illuminate\Support\Facades\Validator;
 
 class adminBarangController extends Controller
 {
+
     public function index(Request $request)
     {
+        // Ambil kategori_barang_id dari request (opsional)
         $kategori_barang_id = $request->kategori_barang_id;
 
-        // $query = Barang::with(['stok' => function ($q) {
-        //     $q->where('status', 'Aktif'); // Hanya menghitung stok dengan status "Aktif"
-        // }])
+        // Query utama untuk mengambil data barang
         $query = Barang::with([
             'stok' => function ($q) {
                 $q->where('status', 'Aktif'); // Hanya menghitung stok dengan status "Aktif"
             },
-            'kategoriBarang' // Tambahkan relasi kategori barang
+            'kategoriBarang', // Relasi kategori barang
+            'stok.transaksiNitipBarangDetail.transaksiNitipBarang' // Relasi untuk transaksi nitip
         ])
             ->orderBy('nama', 'asc')
             ->whereNull("deleted_at")
             ->where("status", "Aktif");
 
+        // Filter berdasarkan kategori_barang_id jika ada
         if ($kategori_barang_id) {
             $query->where("kategori_barang_id", $kategori_barang_id);
         }
 
-        // $items = $query->get()->map(function ($barang) {
-        //     $barang->total_stok = $barang->stok->sum('jml'); // Tambahkan total stok ke hasil
-        //     return $barang;
-        // });
+        // Ambil data barang
         $items = $query->get()->map(function ($barang) {
-            $barang->total_stok = $barang->stok->sum('jml'); // Tambahkan total stok ke hasil
-            $barang->kategori_barang_nama = $barang->kategoriBarang->nama ?? null; // Tambahkan kategori_barang_nama
+            // Hitung total stok barang
+            $barang->total_stok = $barang->stok->sum('jml');
+
+            // Tambahkan nama kategori barang
+            $barang->kategori_barang_nama = $barang->kategoriBarang->nama ?? null;
+
+            // Proses data transaksi nitip
+            $barang->transaksi_nitip = $barang->stok
+                ->flatMap(function ($stok) {
+                    return $stok->transaksiNitipBarangDetail->map(function ($detail) {
+                        return [
+                            'transaksi_nitip_barang_id' => $detail->transaksiNitipBarang->id,
+                            'tanggal_transaksi' => $detail->transaksiNitipBarang->created_at,
+                            'reseller_id' => $detail->transaksiNitipBarang->reseller_id,
+                            'reseller_nama' => optional($detail->transaksiNitipBarang->reseller)->nama ?? null,
+                            'stok_barang_id' => $detail->stok_barang_id,
+                            'qty' => $detail->qty,
+                            'harga' => $detail->harga,
+                        ];
+                    });
+                })
+                ->values(); // Konversi ke array numerik
+
+            // Hitung total stok nitip di reseller
+            $barang->total_stok_nitip_direseller = $barang->transaksi_nitip->sum('qty');
+
             return $barang;
         });
 
+        // Kembalikan respons JSON
         return response()->json([
             'success' => true,
-            'data'    => $items,
+            'data' => $items,
         ], 200);
     }
+    // public function index(Request $request)
+    // {
+    //     $kategori_barang_id = $request->kategori_barang_id;
+
+    //     $query = Barang::with([
+    //         'stok' => function ($q) {
+    //             $q->where('status', 'Aktif'); // Hanya menghitung stok dengan status "Aktif"
+    //         },
+    //         'kategoriBarang' // Tambahkan relasi kategori barang
+    //     ])
+    //         ->orderBy('nama', 'asc')
+    //         ->whereNull("deleted_at")
+    //         ->where("status", "Aktif");
+
+    //     if ($kategori_barang_id) {
+    //         $query->where("kategori_barang_id", $kategori_barang_id);
+    //     }
+
+    //     $items = $query->get()->map(function ($barang) {
+    //         $barang->total_stok = $barang->stok->sum('jml'); // Tambahkan total stok ke hasil
+    //         $barang->kategori_barang_nama = $barang->kategoriBarang->nama ?? null; // Tambahkan kategori_barang_nama
+    //         return $barang;
+    //     });
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'data'    => $items,
+    //     ], 200);
+    // }
 
     public function store(Request $request)
     {

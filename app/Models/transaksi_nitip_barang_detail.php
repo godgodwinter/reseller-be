@@ -20,6 +20,12 @@ class transaksi_nitip_barang_detail extends Model
     {
         return $this->belongsTo(stok_barang::class);
     }
+
+    public function transaksiNitipBarang()
+    {
+        return $this->belongsTo(transaksi_nitip_barang::class);
+    }
+
     public static function boot()
     {
         parent::boot();
