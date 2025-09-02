@@ -30,7 +30,9 @@ Route::get("admin/index", function () {
     ]);
 });
 // Route::middleware(['auth:api'])->group(
-
+// !testing
+// Route::get('/gues/barang', [adminBarangController::class, 'index']);
+// !admin
 Route::middleware('babeng:adminOwner')->group(
     function () {
         Route::get("admin/auth/me", [AuthController::class, 'me']);

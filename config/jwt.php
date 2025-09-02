@@ -264,6 +264,8 @@ return [
     */
 
     'providers' => [
+        'users' => 'users',
+        'reseller' => 'reseller',
         /*
         |--------------------------------------------------------------------------
         | JWT Provider

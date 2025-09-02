@@ -76,10 +76,6 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Reseller::class,
         ],
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
 
     /*

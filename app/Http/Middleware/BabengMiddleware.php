@@ -10,39 +10,39 @@ class BabengMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, string $role)
     {
+        switch ($role) {
+            case 'reseller':
+                Auth::shouldUse('reseller');
 
-        if ($role === 'adminOwner') {
-            if (Auth::guard()->user()) {
+                if (Auth::guard('reseller')->check()) {
+                    return $next($request);
+                }
 
-                return $next($request);
-            } else {
                 return response()->json([
-                    'success'    => false,
-                    'message'    => 'Silahkan Login Terlebih Dahulu',
+                    'success' => false,
+                    'message' => 'Silahkan Login Terlebih Dahulu (Reseller)',
                 ], 401);
-            }
-        } elseif ($role === 'reseller') {
-            if (Auth::guard('reseller')->user()) {
 
-                return $next($request);
-            } else {
+            case 'adminOwner':
+                Auth::shouldUse('api'); // default guard adminOwner
+
+                if (Auth::check()) {
+                    return $next($request);
+                }
+
                 return response()->json([
-                    'success'    => false,
-                    'message'    => 'Silahkan Login Terlebih Dahulu',
+                    'success' => false,
+                    'message' => 'Silahkan Login Terlebih Dahulu (Admin)',
                 ], 401);
-            }
-        } else {
-            return response()->json([
-                'success'    => false,
-                'message'    => 'Role tidak ditemukan',
-            ], 401);
+
+            default:
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Role tidak ditemukan',
+                ], 401);
         }
     }
 }
