@@ -9,6 +9,7 @@ use App\Http\Controllers\admin\adminResellerController;
 use App\Http\Controllers\admin\adminStokBarangController;
 use App\Http\Controllers\admin\adminTransaksiController;
 use App\Http\Controllers\admin\adminTransaksiNitipbarangController;
+use App\Http\Controllers\admin\adminTransaksiSetorbarangController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -84,6 +85,12 @@ Route::middleware('babeng:adminOwner')->group(
         Route::post('/admin/transaksi/nitip_barang/get/reseller/{reseller_id}/per_barang', [adminTransaksiNitipbarangController::class, 'get_where_reseller_id_per_barang']);
         Route::post('/admin/transaksi/nitip_barang/get/reseller/{reseller_id}/per_stok_barang', [adminTransaksiNitipbarangController::class, 'get_where_reseller_id_per_stok_barang']);
         Route::post('/admin/transaksi/nitip_barang', [adminTransaksiNitipbarangController::class, 'store']);
+
+
+
+        Route::post('/admin/transaksi/setor_barang/get_all', [adminTransaksiSetorbarangController::class, 'get_all']);
+        Route::post('/admin/transaksi/setor_barang/get_setor_barang_where_id/{id}', [adminTransaksiSetorbarangController::class, 'get_setor_barang_where_id']);
+        Route::post('/admin/transaksi/setor_barang/konfirmasi', [adminTransaksiSetorbarangController::class, 'do_konfirmasi']);
 
         // Route::get('/admin/reseller', [adminKategoriController::class, 'index']);
         // Route::post('/admin/reseller', [adminKategoriController::class, 'store']);
