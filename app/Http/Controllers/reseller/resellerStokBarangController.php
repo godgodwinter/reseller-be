@@ -28,8 +28,6 @@ class resellerStokBarangController extends Controller
         return Auth::guard('reseller')->user();
     }
 
-
-
     public function setor_barang(Request $request)
     {
         $user = $this->getResellerUser();
@@ -45,7 +43,7 @@ class resellerStokBarangController extends Controller
     {
         $filters = $request->only(['sort_by', 'sort_direction']);
         $user = $this->getResellerUser();
-        $result = $this->resellerService->fn_reseller_getStokBarang($filters, $user->id);
+        $result = $this->resellerService->fn_reseller_getStokBarang_v2($filters, $user->id);
 
         return response()->json($result, $result['success'] ? 200 : 400);
     }
@@ -55,7 +53,7 @@ class resellerStokBarangController extends Controller
         $barang_id = $request->barang_id ?? null;
         $filters = $request->only(['sort_by', 'sort_direction']);
         $user = $this->getResellerUser();
-        $result = $this->resellerService->fn_reseller_getStokBarang_ByBarangId($filters, $user->id, $barang_id);
+        $result = $this->resellerService->fn_reseller_getStokBarang_ByBarangId_v2($filters, $user->id, $barang_id);
 
         return response()->json($result, $result['success'] ? 200 : 400);
     }
@@ -100,7 +98,7 @@ class resellerStokBarangController extends Controller
         }
 
         // 🔹 Validasi stok sebelum simpan
-        $validation = $this->resellerService->fn_validateStokTransaksiSetor($request->detail_barang, $reseller_id);
+        $validation = $this->resellerService->fn_validateStokTransaksiSetor_v2($request->detail_barang, $reseller_id);
 
         if (!$validation['success']) {
             return response()->json([
