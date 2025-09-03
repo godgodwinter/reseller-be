@@ -12,7 +12,7 @@ class adminResellerController extends Controller
 {
     public function index(Request $request)
     {
-        $items = Reseller::get();
+        $items = reseller::get();
         return response()->json([
             'success'    => true,
             'data'    => $items,
@@ -36,7 +36,7 @@ class adminResellerController extends Controller
 
         $items = 'Data berhasil di tambahkan';
 
-        $user = Reseller::create([
+        $user = reseller::create([
             'nama' => $request->nama,
             'email' => $request->email,
             'username' => $request->username,
@@ -71,7 +71,7 @@ class adminResellerController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        Reseller::where('id', $item->id)
+        reseller::where('id', $item->id)
             ->update([
                 'nama' => $request->nama,
                 'email' => $request->email,
@@ -83,7 +83,7 @@ class adminResellerController extends Controller
 
         // update password
         if ($request->password) {
-            Reseller::where('id', $item->id)
+            reseller::where('id', $item->id)
                 ->update([
                     'password' => Hash::make($request->password),
                     'updated_at' => date("Y-m-d H:i:s")
@@ -91,7 +91,7 @@ class adminResellerController extends Controller
         }
 
         if ($request->status_login) {
-            Reseller::where('id', $item->id)
+            reseller::where('id', $item->id)
                 ->update([
                     'status_login' => $request->status_login,
                     'updated_at' => date("Y-m-d H:i:s")
@@ -133,7 +133,7 @@ class adminResellerController extends Controller
     // public function destroy(Reseller $item)
     // {
 
-    //     Reseller::destroy($item->id);
+    //     reseller::destroy($item->id);
     //     return response()->json([
     //         'success'    => true,
     //         'message'    => 'Data berhasil di hapus!',
@@ -142,7 +142,7 @@ class adminResellerController extends Controller
     public function destroy($item)
     {
 
-        Reseller::where('id', $item)->forcedelete();
+        reseller::where('id', $item)->forcedelete();
         return response()->json([
             'success'    => true,
             'message'    => 'Data berhasil di hapus!',

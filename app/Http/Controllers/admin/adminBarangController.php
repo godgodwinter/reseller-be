@@ -18,7 +18,7 @@ class adminBarangController extends Controller
         $kategori_barang_id = $request->kategori_barang_id;
 
         // Query utama untuk mengambil data barang
-        $query = Barang::with([
+        $query = barang::with([
             'stok' => function ($q) {
                 $q->where('status', 'Aktif'); // Hanya menghitung stok dengan status "Aktif"
             },
@@ -75,7 +75,7 @@ class adminBarangController extends Controller
     // {
     //     $kategori_barang_id = $request->kategori_barang_id;
 
-    //     $query = Barang::with([
+    //     $query = barang::with([
     //         'stok' => function ($q) {
     //             $q->where('status', 'Aktif'); // Hanya menghitung stok dengan status "Aktif"
     //         },

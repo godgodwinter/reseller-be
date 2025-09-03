@@ -82,7 +82,7 @@ class ResellerAuthController extends Controller
             'password' => 'required|string|min:3',
         ]);
 
-        $user = Reseller::create([
+        $user = reseller::create([
             'name' => $request->name,
             'email' => $request->email,
             'username' => $request->username,

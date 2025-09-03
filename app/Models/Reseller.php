@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class Reseller extends Authenticatable implements JWTSubject
+class reseller extends Authenticatable implements JWTSubject
 {
     // use HasApiTokens, HasFactory, Notifiable;
     // protected $connection = 'mysql';
