@@ -74,7 +74,7 @@ return [
         ],
         'reseller' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Reseller::class,
+            'model' => App\Models\reseller::class,
         ],
     ],
 
