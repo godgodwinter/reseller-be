@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Reseller;
+use App\Models\reseller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -52,14 +52,14 @@ class adminResellerController extends Controller
         ], 200);
     }
 
-    public function edit(Reseller $item)
+    public function edit(reseller $item)
     {
         return response()->json([
             'success'    => true,
             'data'    => $item,
         ], 200);
     }
-    public function update(Reseller $item, Request $request)
+    public function update(reseller $item, Request $request)
     {
 
         //set validation
@@ -104,7 +104,7 @@ class adminResellerController extends Controller
             'id' => $item->id
         ], 200);
     }
-    public function updatePassword(Reseller $item, Request $request)
+    public function updatePassword(reseller $item, Request $request)
     {
         // Validasi input hanya untuk password
         $validator = Validator::make($request->all(), [
