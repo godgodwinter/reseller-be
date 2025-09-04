@@ -31,11 +31,40 @@ class resellerStokBarangController extends Controller
     public function setor_barang_index(Request $request)
     {
         $user = $this->getResellerUser();
+
+        // Query utama dari transaksi_setor_barang
+        $query = transaksi_setor_barang::with('details') // Pastikan relasi 'details' sudah didefinisikan di model
+            ->where('reseller_id', $user->id);
+
+        // Filter berdasarkan status_konfirmasi jika ada
+        $status = $request->input('status_konfirmasi');
+        if ($status && $status !== 'semua') {
+            $query->where('status_konfirmasi', $status);
+        }
+
+        // Filter berdasarkan tanggal transaksi (format Y-m-d)
+        $tanggal = $request->input('tgl_transaksi_setor_barang');
+        if ($tanggal) {
+            $query->whereDate('tgl_transaksi_setor_barang', $tanggal);
+        }
+
+        // Urutkan dari terbaru
+        $query->orderBy('tgl_transaksi_setor_barang', 'desc');
+
+        // Pagination (misalnya 10 data per halaman)
+        $data = $query->paginate(10);
+
+        // Opsional: tambahkan parameter filter yang digunakan
+        $filters = [
+            'status_konfirmasi' => $status,
+            'tgl_transaksi_setor_barang' => $tanggal,
+        ];
+
         return response()->json([
-            'success'    => true,
-            'data'    => "Proses setor barang Reseller ke seller dengan bukti tf",
-            'my_id' => $user->id, // Ambil ID user
-            'user'  => $user,     // Opsional: kirim seluruh data user
+            'success' => true,
+            'message' => 'Data Setor Barang',
+            'filters' => $filters,
+            'data' => $data,
         ], 200);
     }
 

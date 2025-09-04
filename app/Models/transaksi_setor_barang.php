@@ -25,6 +25,11 @@ class transaksi_setor_barang extends Model
         return $this->hasMany(transaksi_setor_barang_detail::class);
     }
 
+    public function details()
+    {
+        return $this->hasMany(transaksi_setor_barang_detail::class, 'transaksi_setor_barang_id');
+    }
+
     public static function boot()
     {
         parent::boot();

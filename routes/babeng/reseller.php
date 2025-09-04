@@ -42,7 +42,7 @@ Route::middleware('babeng:reseller')->group(
         Route::get('/reseller/stok_barang', [resellerStokBarangController::class, 'index']);
         Route::get('/reseller/stok_barang/example', [resellerStokBarangController::class, 'example']);
 
-        Route::post('/reseller/stok_barang/setor_barang', [resellerStokBarangController::class, 'setor_barang_index']);
+        Route::get('/reseller/stok_barang/setor_barang', [resellerStokBarangController::class, 'setor_barang_index']);
         Route::post('/reseller/stok_barang/get', [resellerStokBarangController::class, 'stok_barang_get']); //per barang_id
         Route::post('/reseller/stok_barang/setor_barang/do_simpan', [resellerStokBarangController::class, 'setor_barang_do_simpan']);
 
