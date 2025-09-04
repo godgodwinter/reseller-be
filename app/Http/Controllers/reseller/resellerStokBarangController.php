@@ -28,7 +28,7 @@ class resellerStokBarangController extends Controller
         return Auth::guard('reseller')->user();
     }
 
-    public function setor_barang(Request $request)
+    public function setor_barang_index(Request $request)
     {
         $user = $this->getResellerUser();
         return response()->json([
@@ -43,7 +43,8 @@ class resellerStokBarangController extends Controller
     {
         $filters = $request->only(['sort_by', 'sort_direction']);
         $user = $this->getResellerUser();
-        $result = $this->resellerService->fn_reseller_getStokBarang_v2($filters, $user->id);
+        // $result = $this->resellerService->fn_reseller_getStokBarang_v3($filters, $user->id);
+        $result = $this->resellerService->fn_reseller_getStokBarang_v3($filters, $user->id);
 
         return response()->json($result, $result['success'] ? 200 : 400);
     }
@@ -53,7 +54,7 @@ class resellerStokBarangController extends Controller
         $barang_id = $request->barang_id ?? null;
         $filters = $request->only(['sort_by', 'sort_direction']);
         $user = $this->getResellerUser();
-        $result = $this->resellerService->fn_reseller_getStokBarang_ByBarangId_v2($filters, $user->id, $barang_id);
+        $result = $this->resellerService->fn_reseller_getStokBarang_ByBarangId_v3($filters, $user->id, $barang_id);
 
         return response()->json($result, $result['success'] ? 200 : 400);
     }
@@ -69,7 +70,7 @@ class resellerStokBarangController extends Controller
         ], 200);
     }
 
-    public function stok_barang_do_simpan(Request $request)
+    public function setor_barang_do_simpan(Request $request)
     {
         $user = $this->getResellerUser();
         $reseller_id = $user->id;
@@ -98,7 +99,7 @@ class resellerStokBarangController extends Controller
         }
 
         // 🔹 Validasi stok sebelum simpan
-        $validation = $this->resellerService->fn_validateStokTransaksiSetor_v2($request->detail_barang, $reseller_id);
+        $validation = $this->resellerService->fn_validateStokTransaksiSetor_v3($request->detail_barang, $reseller_id);
 
         if (!$validation['success']) {
             return response()->json([
@@ -148,6 +149,105 @@ class resellerStokBarangController extends Controller
                 'message' => 'Data berhasil disimpan.',
                 'data' => [
                     'transaksi_setor_barang_id' => $data_id,
+                    'detail_barang' => $request->detail_barang,
+                ],
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error simpan transaksi setor barang: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
+    public function retur_barang_do_simpan(Request $request)
+    {
+        $user = $this->getResellerUser();
+        $reseller_id = $user->id;
+
+        // ✅ Perbaiki validasi: gunakan nitipdetail_id dan stok_id
+        $validator = Validator::make($request->all(), [
+            // 'metode_pembayaran' => 'required|string|max:50',
+            'tgl_transaksi_retur_barang' => 'nullable|date',
+            // 'bukti_tf' => 'nullable|string',
+            'detail_barang' => 'required|array|min:1',
+            'detail_barang.*.nitipdetail_id' => 'required|integer|exists:transaksi_nitip_barang_detail,id',
+            'detail_barang.*.stok_id' => 'required|integer|exists:stok_barang,id',
+            'detail_barang.*.qty' => 'required|integer|min:1',
+            'detail_barang.*.harga' => 'required|numeric|min:0',
+        ], [
+            'detail_barang.*.nitipdetail_id.exists' => 'Detail transaksi titip tidak valid atau tidak ditemukan.',
+            'detail_barang.*.stok_id.exists' => 'Stok barang tidak valid.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal.',
+                'data' => $validator->errors(),
+            ], 422);
+        }
+
+        // 🔹 Validasi stok sebelum simpan
+        $validation = $this->resellerService->fn_validateStokTransaksiSetor_v3($request->detail_barang, $reseller_id);
+
+        if (!$validation['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => $validation['message'],
+                'errors' => $validation['errors'],
+            ], 422);
+        }
+
+        // Mulai transaksi database
+        DB::beginTransaction();
+        try {
+            $tglTransaksi = $request->filled('tgl_transaksi_retur_barang')
+                ? $request->tgl_transaksi_retur_barang
+                : now()->format('Y-m-d\TH:i');
+
+            $data_id = DB::table('transaksi_retur_barang')->insertGetId([
+                'reseller_id'                   => $reseller_id,
+                'tgl_transaksi_retur_barang'  => $tglTransaksi,
+                // 'bukti_tf'                      => $request->bukti_tf,
+                // 'metode_pembayaran'             => $request->metode_pembayaran,
+                // 'status_konfirmasi'             => "Belum",
+                'status'                        => "Aktif",
+                'users_id'                      => $reseller_id,
+                'created_at'                    => now(),
+                'updated_at'                    => now(),
+            ]);
+
+            foreach ($request->detail_barang as $detail) {
+                DB::table('transaksi_retur_barang_detail')->insert([
+                    'reseller_id'                   => $reseller_id,
+                    'stok_barang_id'           => $detail['stok_id'],
+                    'transaksi_nitip_barang_detail_id'           => $detail['nitipdetail_id'],
+                    'harga'                    => $detail['harga'],
+                    'qty'                      => $detail['qty'],
+                    'transaksi_retur_barang_id' => $data_id,
+                    'status_konfirmasi'         => "Belum",
+                    'created_at'               => now(),
+                    'updated_at'               => now(),
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil disimpan.',
+                'data' => [
+                    'transaksi_retur_barang_id' => $data_id,
                     'detail_barang' => $request->detail_barang,
                 ],
             ], 200);
