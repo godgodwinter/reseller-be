@@ -15,6 +15,17 @@ class transaksi_retur_barang_detail extends Model
 
     protected $guarded = [];
 
+
+    public function stok_barang()
+    {
+        return $this->belongsTo(stok_barang::class);
+    }
+
+    public function transaksiReturBarang()
+    {
+        return $this->belongsTo(transaksi_retur_barang::class);
+    }
+
     public static function boot()
     {
         parent::boot();

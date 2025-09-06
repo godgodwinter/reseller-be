@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\reseller;
 
 use App\Http\Controllers\Controller;
+use App\Models\transaksi_retur_barang;
 use App\Models\transaksi_setor_barang;
 use App\Models\transaksi_setor_barang_detail;
 use Illuminate\Http\Request;
@@ -32,29 +33,40 @@ class resellerStokBarangController extends Controller
     {
         $user = $this->getResellerUser();
 
-        // Query utama dari transaksi_setor_barang
-        $query = transaksi_setor_barang::with('details') // Pastikan relasi 'details' sudah didefinisikan di model
-            ->where('reseller_id', $user->id);
+        // Eager load relasi hingga ke barang dan kategori_barang
+        $query = transaksi_setor_barang::with([
+            'details.stok_barang.barang.kategori_barang'
+        ])->where('reseller_id', $user->id);
 
-        // Filter berdasarkan status_konfirmasi jika ada
         $status = $request->input('status_konfirmasi');
         if ($status && $status !== 'semua') {
             $query->where('status_konfirmasi', $status);
         }
 
-        // Filter berdasarkan tanggal transaksi (format Y-m-d)
         $tanggal = $request->input('tgl_transaksi_setor_barang');
         if ($tanggal) {
             $query->whereDate('tgl_transaksi_setor_barang', $tanggal);
         }
 
-        // Urutkan dari terbaru
         $query->orderBy('tgl_transaksi_setor_barang', 'desc');
 
-        // Pagination (misalnya 10 data per halaman)
         $data = $query->paginate(10);
 
-        // Opsional: tambahkan parameter filter yang digunakan
+        // Tambahkan informasi nama barang & kategori di setiap detail
+        $data->getCollection()->transform(function ($transaksi) {
+            $transaksi->details->transform(function ($detail) {
+                // Ambil nama barang dan kategori dari relasi
+                $barang = $detail->stok_barang?->barang;
+                $kategori = $barang?->kategori_barang;
+
+                $detail->nama_barang = $barang?->nama ?? 'Tidak tersedia';
+                $detail->kategori_barang = $kategori?->nama ?? 'Tidak tersedia';
+
+                return $detail;
+            });
+            return $transaksi;
+        });
+
         $filters = [
             'status_konfirmasi' => $status,
             'tgl_transaksi_setor_barang' => $tanggal,
@@ -65,6 +77,56 @@ class resellerStokBarangController extends Controller
             'message' => 'Data Setor Barang',
             'filters' => $filters,
             'data' => $data,
+        ], 200);
+    }
+
+
+    public function setor_barang_per_transaksi_id(Request $request, $setor_id)
+    {
+        $user = $this->getResellerUser();
+
+        // Ambil transaksi berdasarkan ID dan pastikan milik reseller ini
+        $transaksi = transaksi_setor_barang::with([
+            'details.stok_barang.barang.kategori_barang'
+        ])
+            ->where('id', $setor_id)
+            ->where('reseller_id', $user->id)
+            ->first();
+
+        // Jika tidak ditemukan
+        if (!$transaksi) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Transaksi tidak ditemukan atau bukan milik Anda.',
+            ], 404);
+        }
+
+        // Tambahkan nama_barang dan kategori_barang ke setiap detail
+        $transaksi->details->transform(function ($detail) {
+            $barang = $detail->stok_barang?->barang;
+            $kategori = $barang?->kategori_barang;
+
+            $detail->nama_barang = $barang?->nama ?? 'Tidak tersedia';
+            $detail->kategori_barang = $kategori?->nama ?? 'Tidak tersedia';
+
+            return $detail;
+        });
+
+        // Hitung total qty dan total harga untuk frontend
+        $totalQty = $transaksi->details->sum('qty');
+        $totalHarga = $transaksi->details->sum(fn($d) => $d->harga * $d->qty);
+
+        // Format tanggal agar lebih mudah dibaca di frontend
+        $transaksi->tgl_transaksi_setor_barang = \Carbon\Carbon::parse($transaksi->tgl_transaksi_setor_barang)->format('Y-m-d H:i:s');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail Transaksi Setor Barang',
+            'data' => $transaksi,
+            'summary' => [
+                'total_qty' => $totalQty,
+                'total_harga' => $totalHarga,
+            ],
         ], 200);
     }
 
@@ -198,6 +260,56 @@ class resellerStokBarangController extends Controller
 
 
 
+    public function retur_barang_index(Request $request)
+    {
+        $user = $this->getResellerUser();
+
+        // Eager load relasi hingga ke barang dan kategori_barang
+        $query = transaksi_retur_barang::with([
+            'details.stok_barang.barang.kategori_barang'
+        ])->where('reseller_id', $user->id);
+
+        // $status = $request->input('status_konfirmasi');
+        // if ($status && $status !== 'semua') {
+        //     $query->where('status_konfirmasi', $status);
+        // }
+
+        $tanggal = $request->input('tgl_transaksi_retur_barang');
+        if ($tanggal) {
+            $query->whereDate('tgl_transaksi_retur_barang', $tanggal);
+        }
+
+        $query->orderBy('tgl_transaksi_retur_barang', 'desc');
+
+        $data = $query->paginate(10);
+
+        // Tambahkan informasi nama barang & kategori di setiap detail
+        $data->getCollection()->transform(function ($transaksi) {
+            $transaksi->details->transform(function ($detail) {
+                // Ambil nama barang dan kategori dari relasi
+                $barang = $detail->stok_barang?->barang;
+                $kategori = $barang?->kategori_barang;
+
+                $detail->nama_barang = $barang?->nama ?? 'Tidak tersedia';
+                $detail->kategori_barang = $kategori?->nama ?? 'Tidak tersedia';
+
+                return $detail;
+            });
+            return $transaksi;
+        });
+
+        $filters = [
+            // 'status_konfirmasi' => $status,
+            'tgl_transaksi_retur_barang' => $tanggal,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Setor Barang',
+            'filters' => $filters,
+            'data' => $data,
+        ], 200);
+    }
     public function retur_barang_do_simpan(Request $request)
     {
         $user = $this->getResellerUser();

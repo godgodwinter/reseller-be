@@ -15,6 +15,21 @@ class transaksi_retur_barang extends Model
 
     protected $guarded = [];
 
+    public function reseller()
+    {
+        return $this->belongsTo(reseller::class);
+    }
+
+    public function transaksi_retur_barang_detail()
+    {
+        return $this->hasMany(transaksi_retur_barang_detail::class);
+    }
+
+    public function details()
+    {
+        return $this->hasMany(transaksi_retur_barang_detail::class, 'transaksi_retur_barang_id');
+    }
+
     public static function boot()
     {
         parent::boot();
